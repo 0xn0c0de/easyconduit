@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+
+# EasyConduit runtime state (never commit these)
+bot_state.json
+bot_runtime.conf
+conduit.env
+
+# Editor/OS junk
+.DS_Store
+*.swp
+
