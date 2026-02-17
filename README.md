@@ -6,7 +6,7 @@ It:
 
 - Installs the official Conduit CLI with embedded Psiphon config.
 - Sets up a Telegram bot as your **only interface** after installation:
-  - One live dashboard message (caption + PNG) that updates every 60 seconds.
+  - One live dashboard message (caption + PNG) that updates every 30 seconds.
   - One command desk message with **inline buttons only** (no text commands needed).
 - Lets you:
   - See connected clients, traffic, uptime, and bandwidth limits.
