@@ -29,8 +29,9 @@ Full step‑by‑step with screenshots is in [`docs/USER_GUIDE_HETZNER.md`](docs
 High‑level steps:
 
 1. **Create Telegram bot + chat ID**
-   - Use @BotFather to create a bot and get the Bot Token.
-   - Use `https://api.telegram.org/bot<token>/getUpdates` to get your Chat ID.
+   - A) Use @BotFather to create a bot and get the Bot Token.
+   - B1) Use `https://api.telegram.org/bot<token>/getUpdates` to get your Chat ID.
+   - B2) Or message @userinfobot to receive your Chat ID 
 2. **Install PuTTY + PuTTYgen** on Windows and create an SSH key.
 3. **Create a VPS on Hetzner** (Ubuntu 22.04/24.04, e.g. CX22) and add your SSH public key.
 4. **Connect once with PuTTY** as `root`.
