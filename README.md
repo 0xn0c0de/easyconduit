@@ -43,7 +43,7 @@ High‑level steps:
 6. When asked:
    - Paste/enter your **Bot Token**.
    - Paste/enter your **Chat ID**.
-   - Press Enter to accept defaults for max clients and bandwidth, or type new values.
+   - max clients and bandwidth are set to default and can be adjusted through the bot.
 7. Wait for “EasyConduit installed…”, then **close PuTTY**.
 8. Open Telegram and talk to your bot:
    - The **top message** is a live dashboard (image + caption) that updates every minute.
