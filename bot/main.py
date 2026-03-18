@@ -686,8 +686,8 @@ def ensure_watchdog_installed(state_dir: str) -> None:
         script_path = os.path.join(bin_dir, "bot-watchdog.sh")
         unit_path = "/etc/systemd/system/easyconduit-bot-watchdog.service"
 
-        if not os.path.isfile(script_path):
-            script = f"""#!/usr/bin/env bash
+        # Always (re)write watchdog artifacts so old buggy versions self-heal.
+        script = f"""#!/usr/bin/env bash
 set -euo pipefail
 STATE_DIR="{state_dir}"
 BOT_DIR="{bot_dir}"
@@ -696,8 +696,11 @@ HB="$STATE_DIR/bot_heartbeat"
 
 while true; do
   if [ -f "$HB" ]; then
-    # If heartbeat file is older than 5 minutes, consider the bot frozen
-    if find "$HB" -mmin +5 >/dev/null 2>&1; then
+    # If heartbeat file is older than 5 minutes, consider the bot frozen.
+    # NOTE: Don't use `find ... -mmin +5` as a boolean test; `find` can exit 0 even when no matches.
+    now=$(date +%s)
+    hb_mtime=$(stat -c %Y "$HB" 2>/dev/null || echo 0)
+    if [ "$hb_mtime" -gt 0 ] && [ $((now - hb_mtime)) -gt 300 ]; then
       echo "[easyconduit-watchdog] Heartbeat stale, attempting rollback/restart" >&2
       if [ -f "$BOT_DIR/main.py.bak" ]; then
         cp "$BOT_DIR/main.py.bak" "$BOT_DIR/main.py"
@@ -708,12 +711,15 @@ while true; do
   sleep 60
 done
 """
+        try:
             with open(script_path, "w", encoding="utf-8") as f:
                 f.write(script)
             os.chmod(script_path, 0o755)
+        except Exception:
+            # If we can't write the watchdog (permissions), proceed without it.
+            return
 
-        if not os.path.isfile(unit_path):
-            unit = f"""[Unit]
+        unit = f"""[Unit]
 Description=EasyConduit bot watchdog (heartbeat + rollback)
 After=easyconduit-bot.service
 
@@ -727,8 +733,12 @@ RestartSec=15
 [Install]
 WantedBy=multi-user.target
 """
+        try:
             with open(unit_path, "w", encoding="utf-8") as f:
                 f.write(unit)
+        except Exception:
+            # If we can't write the unit, proceed without it.
+            return
 
         # (Re)load and ensure watchdog is active; failures are non-fatal
         os.system("systemctl daemon-reload >/dev/null 2>&1 || true")
